@@ -8,8 +8,8 @@
 \usepackage{xcolor}
 \usepackage{multirow}
 
-\title{Simulating Human Creativity: \\
-Evaluating LLMs as Psychometric Simulacra}
+\title{Simulating Creativity: \\
+LLMs as Synthetic Participants in Creativity Research}
 
 \author{
 Anonymous Authors\\
@@ -43,43 +43,42 @@ We investigate this question by comparing CRPO against baseline models (Llama 3.
 
 \subsection{Participants and Models}
 
-\textbf{Human sample.} We recruited approximately 240 participants via Prolific, yielding 4,683 matched responses across four creativity tasks (one response per item per participant, randomly selected to match LLM sampling constraints).
+\textbf{Human sample.} We recruited approximately 240 participants via Prolific. Each participant completed all four creativity tasks, with multiple items per task. To create matched samples for comparison, we randomly selected one response per item per participant, yielding 4,683 matched responses.
 
 \textbf{Model configurations.} We evaluated three LLM configurations:
 \begin{itemize}
-    \item \textbf{CRPO}: Llama 3.1 fine-tuned via Creative Preference Optimization on human creativity responses from the MuCE dataset \citep{ismayilzada2025crpo}
+    \item \textbf{CRPO}: Llama 3.1 8B fine-tuned via Creative Preference Optimization on human creativity responses from the MuCE dataset \citep{ismayilzada2025crpo}
     \item \textbf{Llama 3.1 8B}: Base model without creativity-specific training
-    \item \textbf{Gemini 3 Flash}: Base model from Google DeepMind
+    \item \textbf{Gemini 2.0 Flash}: Commercial model from Google DeepMind
 \end{itemize}
 
-Each model generated responses for 245 synthetic ``participants'' across all items, mirroring the human study structure. Responses were generated via batched API calls, with one synthetic participant per call containing all task prompts within context.
+Each model generated responses for 245 synthetic ``participants'' across all items, mirroring the human study structure. Responses were generated via batched API calls with temperature set to 1.0 to encourage response diversity. Each API call simulated one ``participant'' completing all tasks within a single context window.
 
 \subsection{Creativity Tasks}
 
 We administered four tasks spanning divergent thinking, scientific creativity, design problem-solving, and narrative generation:
 \begin{itemize}
-    \item \textbf{Alternate Uses Task (AUT)}: Generate creative uses for common objects
-    \item \textbf{Scientific Creative Thinking Task (SCTT)}: Generate hypotheses and research questions for scientific scenarios
-    \item \textbf{Design Problem-Solving}: Propose solutions to real-world design challenges
-    \item \textbf{Story Writing}: Write short creative stories incorporating specified words
+    \item \textbf{Alternate Uses Task (AUT)}: Generate creative uses for common objects (5 items: brick, newspaper, shoe, paperclip, blanket)
+    \item \textbf{Scientific Creative Thinking Task (SCTT)}: Generate hypotheses and research questions for scientific scenarios (5 items)
+    \item \textbf{Design Problem-Solving}: Propose solutions to real-world design challenges (5 items)
+    \item \textbf{Story Writing}: Write short creative stories incorporating three specified words (4 prompts)
 \end{itemize}
 
 \subsection{Scoring}
 
-Responses were evaluated using the Creative Assessment Platform (CAP), an AI-based scoring system providing \textbf{originality} ratings (AUT, SCTT, Design) and \textbf{effectiveness} ratings (Design only).
+Responses were evaluated using the Creative Assessment Platform (CAP), an AI-based scoring system that rates responses on a 0--1 scale. CAP provided \textbf{originality} ratings for AUT, SCTT, and Design tasks, and \textbf{effectiveness} ratings for Design only.
 
-For story responses, we employed two complementary metrics: (1) \textbf{Divergent Semantic Integration} (DSI), measuring average pairwise semantic distance between words, and (2) \textbf{MAoSS}, an AI-based creativity rating. This dual approach allowed us to examine whether distributional patterns differ across scoring methodologies.
+For story responses, we employed two complementary metrics: (1) \textbf{Divergent Semantic Integration} (DSI), measuring average pairwise semantic distance between words in the story, and (2) \textbf{MAoSS} (Model-as-a-Scorer), an LLM-based creativity rating. This dual approach allowed us to examine whether distributional patterns differ across scoring methodologies.
 
 \subsection{Analysis}
 
 Our primary outcome measure was \textbf{distributional similarity} between model and human responses, quantified via:
 \begin{itemize}
-    \item Cohen's $d$ (pooled SD) for effect size estimation
-    \item Independent samples $t$-tests for mean comparisons
-    \item Semantic centroid similarity using sentence embeddings
+    \item Two-sample Kolmogorov-Smirnov (KS) tests to assess whether creativity score distributions differ significantly between sources
+    \item Semantic centroid similarity, computed by embedding all responses using a sentence transformer, calculating the centroid of human responses for each task, and measuring cosine similarity between each model's response centroid and the human centroid
 \end{itemize}
 
-We hypothesized that CRPO, trained on human creativity preferences, would produce distributions most similar to human patterns, reflected in smaller effect sizes and higher semantic similarity.
+We hypothesized that CRPO, trained on human creativity preferences, would produce distributions most similar to human patterns, reflected in non-significant KS tests and higher semantic similarity to human response centroids.
 
 \section{Results}
 
@@ -171,28 +170,7 @@ Story creativity was assessed using two metrics: DSI (semantic distance) and MAo
 
 \subsection{Summary: Most Human-Like Model}
 
-Across metrics, CRPO emerged as the most human-like model on 4 of 6 measures (Table~\ref{tab:summary}), supporting our hypothesis that preference-optimized training produces more valid simulacra.
-
-\begin{table}[!t]
-\centering
-\footnotesize
-\caption{Most and least human-like model by metric}
-\label{tab:summary}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lll@{}}
-\toprule
-Metric & Best & Worst \\
-\midrule
-AUT Orig. & CRPO & Gemini \\
-SCTT Orig. & CRPO & Gemini \\
-Design Orig. & CRPO & Gemini \\
-Design Eff. & CRPO & Llama \\
-Story (DSI) & Llama & Gemini \\
-Story (MAoSS) & Gemini & CRPO \\
-\bottomrule
-\end{tabular}
-\end{table}
-
+Across metrics, CRPO emerged as the most human-like model on 4 of 6 measures, supporting our hypothesis that preference-optimized training produces more valid simulacra. CRPO was closest to human distributions for AUT, SCTT, and Design originality, as well as Design effectiveness. Llama Base was closest on story DSI, and Gemini on story MAoSS. Gemini showed the largest divergence from humans on most metrics.
 
 \section{Discussion}
 
@@ -236,8 +214,6 @@ Several limitations warrant consideration:
 \textbf{Training data overlap.} One story prompt (pen-paper-write) appeared in CRPO's training data (MuCE dataset), while other prompts were held out. This limits our ability to fully distinguish learned human-like patterns from memorized responses, though CRPO's consistent performance across held-out prompts suggests some generalization.
 
 \textbf{Prompting strategy.} Baseline models were prompted without specialized techniques. Advanced prompting strategies (e.g., persona prompting, chain-of-thought) may elicit more human-like distributional patterns from base models.
-
-\textbf{Population representativeness.} Human participants were recruited via Prolific, a convenience sample that may not represent the full range of human creative ability. Similarly, the 245 synthetic ``participants'' per model represent a limited sampling of each model's output distribution.
 
 \textbf{Single response sampling.} To match human and LLM sample structures, we randomly selected one response per item per participant. This approach was necessary because LLM responses were generated in batched API calls (one ``participant'' per call, with multiple tasks fit within context), but it limits our ability to examine within-participant response variability.
 

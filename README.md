@@ -1,6 +1,6 @@
 # simulacrea
 
-**Simulating Human Creativity: Evaluating LLMs as Psychometric Simulacra**
+**Simulating Creativity: LLMs as Synthetic Participants in Creativity Research**
 
 This repository contains code and analysis for comparing LLM-generated creativity responses against human responses on established psychometric tasks.
 
@@ -22,20 +22,19 @@ We evaluate whether LLMs can serve as valid "simulacra" for creativity research 
 | Human | Prolific participants | ~240 |
 | CRPO | Creative Preference Optimization (Llama 3.1 fine-tuned on MuCE dataset) | 245 |
 | Llama Base | Llama 3.1 8B | 245 |
-| Gemini | Gemini 3 Flash | 245 |
+| Gemini | Gemini 2.0 Flash | 245 |
 
 ## Scoring
 
-- **CAP** (Creative Assessment Platform): AI-based originality and effectiveness scoring
-- **DSI** (Divergent Semantic Integration): Average pairwise semantic distance
-- **MAoSS**: AI-based story creativity rating
+- **CAP** (Creative Assessment Platform): AI-based originality, effectiveness, and story creativity scoring
+- **DSI** (Divergent Semantic Integration): Average pairwise semantic distance between words
 
 ## Key Findings
 
-- All LLMs exceed human originality scores on AI-rated metrics
-- **CRPO is closest to human distributions** on 4/6 metrics
+- **CRPO produces the most human-like creativity distributions** across 4 of 6 metrics
 - CRPO matches human effectiveness ratings almost perfectly (d = 0.03)
-- For semantic similarity, CRPO responses are closest to human response centroids
+- CRPO responses show highest semantic similarity to human response centroids
+- Preference-optimized training yields more valid simulacra than base models
 
 See [analysis_results/REPORT_MATCHED.md](analysis_results/REPORT_MATCHED.md) for detailed results.
 
@@ -82,7 +81,7 @@ If you use this code or data, please cite:
 
 ```bibtex
 @article{simulacrea2025,
-  title={Simulating Human Creativity: Evaluating LLMs as Psychometric Simulacra},
+  title={Simulating Creativity: LLMs as Synthetic Participants in Creativity Research},
   author={Anonymous},
   year={2025}
 }
