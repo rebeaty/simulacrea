@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+*.env
+
+# Embeddings cache (large files)
+embedding_cache/
+embedding_cache_batch/
+embedding_cache_matched/
+*.npy
+
+# Intermediate files
+matched_samples/
+
+# Raw API logs (large debug files)
+raw_api_responses_*.log
+
+# Generated outputs (optional - may want to track these)
+# llm_responses/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+stdout.txt
+stderr.txt
+
+# LaTeX artifacts
+*.aux
+*.out
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+
+# Overleaf packaging (temporary)
+overleaf_upload.zip
+overleaf_package/
+
+# Windows artifacts
+nul

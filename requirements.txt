@@ -1,0 +1,19 @@
+# Core dependencies
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+
+# API clients
+aiohttp>=3.8.0
+google-genai>=0.3.0
+anthropic>=0.18.0
+
+# NLP and analysis
+wordfreq>=3.0.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities
+python-dotenv>=1.0.0
