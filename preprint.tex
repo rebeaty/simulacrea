@@ -49,7 +49,7 @@ We investigate this question by comparing CRPO against baseline models (Llama 3.
 \begin{itemize}
     \item \textbf{CRPO}: Llama 3.1 8B fine-tuned via Creative Preference Optimization on human creativity responses from the MuCE dataset \citep{ismayilzada2025crpo}
     \item \textbf{Llama 3.1 8B}: Base model without creativity-specific training
-    \item \textbf{Gemini 2.0 Flash}: Commercial model from Google DeepMind
+    \item \textbf{Gemini 3 Flash}: Commercial model from Google DeepMind
 \end{itemize}
 
 Each model generated responses for 245 synthetic ``participants'' across all items, mirroring the human study structure. Responses were generated via batched API calls with temperature set to 1.0 to encourage response diversity. Each API call simulated one ``participant'' completing all tasks within a single context window.
@@ -58,9 +58,9 @@ Each model generated responses for 245 synthetic ``participants'' across all ite
 
 We administered four tasks spanning divergent thinking, scientific creativity, design problem-solving, and narrative generation:
 \begin{itemize}
-    \item \textbf{Alternate Uses Task (AUT)}: Generate creative uses for common objects (5 items: brick, newspaper, shoe, paperclip, blanket)
-    \item \textbf{Scientific Creative Thinking Task (SCTT)}: Generate hypotheses and research questions for scientific scenarios (5 items)
-    \item \textbf{Design Problem-Solving}: Propose solutions to real-world design challenges (5 items)
+    \item \textbf{Alternate Uses Task (AUT)}: Generate creative uses for common objects (4 items)
+    \item \textbf{Scientific Creative Thinking Task (SCTT)}: Generate hypotheses and research questions for scientific scenarios (4 items)
+    \item \textbf{Design Problem-Solving}: Propose solutions to real-world design challenges (4 items)
     \item \textbf{Story Writing}: Write short creative stories incorporating three specified words (4 prompts)
 \end{itemize}
 
@@ -68,7 +68,7 @@ We administered four tasks spanning divergent thinking, scientific creativity, d
 
 Responses were evaluated using the Creative Assessment Platform (CAP), an AI-based scoring system that rates responses on a 0--1 scale. CAP provided \textbf{originality} ratings for AUT, SCTT, and Design tasks, and \textbf{effectiveness} ratings for Design only.
 
-For story responses, we employed two complementary metrics: (1) \textbf{Divergent Semantic Integration} (DSI), measuring average pairwise semantic distance between words in the story, and (2) \textbf{MAoSS} (Model-as-a-Scorer), an LLM-based creativity rating. This dual approach allowed us to examine whether distributional patterns differ across scoring methodologies.
+For story responses, we employed two complementary metrics: (1) \textbf{Divergent Semantic Integration} (DSI), measuring average pairwise semantic distance between words in the story, and (2) \textbf{MAoSS} (Multilingual Assessment of Short Stories), an LLM-based creativity rating. This dual approach allowed us to examine whether distributional patterns differ across scoring methodologies.
 
 \subsection{Analysis}
 
@@ -166,7 +166,7 @@ Gemini & .622 & .139 & --0.65 \\
 
 \subsection{Story Creativity}
 
-Story creativity was assessed using two metrics: DSI (semantic distance) and MAoSS (AI-based rating). These metrics yielded divergent results. For DSI, humans scored higher than all models, with Llama Base closest ($d = 0.20$). For MAoSS (AI-based ratings), LLMs scored higher than humans---consistent with the originality pattern---with Gemini closest to human distributions ($d = -0.45$). This divergence suggests DSI and AI-based ratings capture different aspects of creative writing.
+Story creativity was assessed using two metrics: DSI (semantic distance) and MAoSS (AI-based rating). These metrics yielded divergent results. For DSI, humans scored higher than all models, with Llama Base closest ($d = 0.20$). For MAoSS (AI-based ratings), LLMs scored higher than humans---consistent with the originality pattern---with Gemini closest to human distributions ($d = -0.45$). This divergence may reflect word count and elaboration biases: DSI rewards semantic diversity across words, potentially favoring shorter, more varied responses, while MAoSS may reward longer, more elaborated narratives typical of LLM outputs.
 
 \subsection{Summary: Most Human-Like Model}
 
@@ -178,15 +178,13 @@ Our results reveal a nuanced picture of LLM simulacra validity. CRPO produces cr
 
 \subsection{Training Data and Task Alignment}
 
-CRPO's advantage on ideation tasks (AUT, SCTT, Design) likely reflects task-specific training. The MuCE dataset contains substantial alternate uses and short-form ideation data, providing CRPO direct exposure to human response patterns on these formats. Base models, pretrained predominantly on narrative and expository text, show comparatively better alignment on story writing---a task format closer to their training distribution.
+CRPO's advantage on ideation tasks (AUT, SCTT, Design) likely reflects task-specific training. The MuCE dataset contains substantial alternate uses and short-form ideation data, providing CRPO direct exposure to human response patterns on these formats. Base models, whose training data includes a significant amount of narrative text, show comparatively better alignment on story writing. Additionally, the MuCE dataset contains fewer story responses relative to ideation tasks, which may contribute to CRPO's reduced alignment with human patterns on this task type.
 
 This task-training alignment effect has important implications for simulacra development: domain-specific fine-tuning may be necessary for valid simulation across diverse task types, rather than relying on general-purpose models.
 
 \subsection{The Originality-Effectiveness Dissociation}
 
-A striking dissociation emerged between originality and effectiveness metrics. All models exceeded human originality scores substantially, yet CRPO matched human effectiveness ratings almost perfectly ($d = 0.03$, $p = .55$). This pattern suggests that AI-based originality scoring may inadvertently reward LLM-typical characteristics---unusual word combinations, diverse semantic content, formal register---rather than features characterizing authentic human creativity.
-
-CRPO's preference optimization appears to calibrate responses toward realistic utility judgments while still producing elevated originality scores. This dissociation warrants careful consideration: if AI scorers systematically favor LLM outputs, they may be unsuitable for evaluating simulacra validity without appropriate recalibration.
+A striking dissociation emerged between originality and effectiveness metrics. All models exceeded human originality scores substantially, yet CRPO matched human effectiveness ratings almost perfectly ($d = 0.03$, $p = .55$). Notably, CRPO was trained to predict human originality ratings, not effectiveness. However, originality and effectiveness are positively correlated on the Design task, which may explain why CRPO's alignment with human originality preferences also produces human-like effectiveness distributions. This dissociation warrants careful consideration: if AI scorers systematically favor LLM outputs on originality, they may be unsuitable for evaluating simulacra validity without appropriate recalibration.
 
 \subsection{Distributional vs.\ Semantic Similarity}
 
@@ -201,9 +199,9 @@ This apparent contradiction reflects different levels of analysis. CRPO produces
 \label{fig:semantic}
 \end{figure*}
 
-\subsection{Held-Out Generalization}
+\subsection{Training Data Considerations}
 
-Notably, only one story prompt (pen-paper-write) appeared in CRPO's training data; the remaining prompts were held out. CRPO's performance across novel prompts suggests some generalization of human-like creativity patterns, though further work is needed to test this hypothesis across additional held-out tasks.
+The tasks used in this study overlap with CRPO's training data: AUT, SCTT, Design, and one story prompt (pen-paper-write) appeared in the MuCE dataset. While the specific items varied (e.g., novel story prompts were used), this overlap limits our ability to fully distinguish learned human-like patterns from task-specific memorization. CRPO's consistent performance across held-out items suggests some generalization, but stronger evidence requires testing on entirely new task types absent from training.
 
 \subsection{Limitations}
 
@@ -211,23 +209,20 @@ Several limitations warrant consideration:
 
 \textbf{Scoring method limitations.} AI-based scoring systems (CAP, MAoSS) may contain systematic biases that differently affect human versus LLM outputs. The consistent pattern of LLMs exceeding human originality scores raises the possibility that these metrics inadvertently reward LLM-typical characteristics (e.g., unusual word combinations, formal language) rather than authentic creativity. The divergence between DSI and MAoSS for story scoring underscores this concern---different metrics yield opposing conclusions about which source is ``more creative.''
 
-\textbf{Training data overlap.} One story prompt (pen-paper-write) appeared in CRPO's training data (MuCE dataset), while other prompts were held out. This limits our ability to fully distinguish learned human-like patterns from memorized responses, though CRPO's consistent performance across held-out prompts suggests some generalization.
+\textbf{Training data overlap.} The task types used in this study (AUT, SCTT, Design, Story) appeared in CRPO's training data, though specific items varied. This overlap limits our ability to fully distinguish learned human-like patterns from task-specific memorization.
 
 \textbf{Prompting strategy.} Baseline models were prompted without specialized techniques. Advanced prompting strategies (e.g., persona prompting, chain-of-thought) may elicit more human-like distributional patterns from base models.
 
 \textbf{Single response sampling.} To match human and LLM sample structures, we randomly selected one response per item per participant. This approach was necessary because LLM responses were generated in batched API calls (one ``participant'' per call, with multiple tasks fit within context), but it limits our ability to examine within-participant response variability.
-
-\textbf{Task scope.} Four creativity tasks, while spanning divergent thinking, problem-solving, and narrative generation, do not capture the full breadth of human creativity (e.g., visual, musical, embodied creativity).
 
 \subsection{Future Directions}
 
 Our findings motivate several extensions:
 
 \begin{enumerate}
-    \item \textbf{Novel task generalization}: Testing CRPO on creativity tasks entirely absent from its training data (e.g., metaphor generation) would provide stronger evidence for human-like creativity transfer
+    \item \textbf{Novel task generalization}: Testing CRPO on creativity tasks entirely absent from its training data (e.g., metaphor generation, visual creativity descriptions) would provide stronger evidence for human-like creativity transfer beyond task-specific learning
     \item \textbf{Cognitive foundation models}: Comparing against Centaur 70B and Minitaur 8B \citep{binz2025centaur} would test whether models trained on broader cognitive data also capture creativity patterns
     \item \textbf{Advanced prompting strategies}: Testing persona prompting, verbalized sampling \citep{zhang2025verbalized}, or other techniques may elicit more human-like distributions from base models
-    \item \textbf{Individual differences}: Examining whether LLMs can simulate the full range of human creative ability, including both high and low performers
 \end{enumerate}
 
 \section{Conclusion}

@@ -22,7 +22,7 @@ We evaluate whether LLMs can serve as valid "simulacra" for creativity research 
 | Human | Prolific participants | ~240 |
 | CRPO | Creative Preference Optimization (Llama 3.1 fine-tuned on MuCE dataset) | 245 |
 | Llama Base | Llama 3.1 8B | 245 |
-| Gemini | Gemini 2.0 Flash | 245 |
+| Gemini | Gemini 3 Flash | 245 |
 
 ## Scoring
 
