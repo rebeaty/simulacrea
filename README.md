@@ -23,6 +23,12 @@ We evaluate whether LLMs can serve as valid "simulacra" for creativity research 
 | CRPO | Creative Preference Optimization (Llama 3.1 fine-tuned on MuCE dataset) | 245 |
 | Llama Base | Llama 3.1 8B | 245 |
 | Gemini | Gemini 3 Flash | 245 |
+| Centaur-70B | Llama 3.1 70B fine-tuned on Psych-101 (marcelbinz/Llama-3.1-Centaur-70B) | 245 |
+| Minitaur-8B | Llama 3.1 8B fine-tuned on Psych-101 (marcelbinz/Llama-3.1-Minitaur-8B) | 245 |
+
+Centaur/Minitaur are *cognitive foundation models* trained to mimic human
+trial-by-trial behavior; they require Psych-101-style transcript prompting and a
+dedicated generation script — see [docs/RUNNING_CENTAUR.md](docs/RUNNING_CENTAUR.md).
 
 ## Scoring
 
@@ -46,11 +52,15 @@ See [analysis_results/REPORT_MATCHED.md](analysis_results/REPORT_MATCHED.md) for
 ├── task_csvs_for_cap/           # Scored data files
 ├── analysis_results/            # Analysis outputs and report
 ├── figures/                     # Publication figures
+├── docs/                        # Centaur deployment guide, open-dataset survey
 ├── preprint.tex                 # LaTeX preprint
-├── generate_responses.py        # LLM response generation
+├── TASK_SPECIFICATION.py        # Task items and prompt templates
+├── generate_responses.py        # LLM response generation (chat models)
+├── generate_centaur_responses.py# Centaur/Minitaur generation (Psych-101 format)
 ├── create_matched_samples.py    # Match human samples to LLM structure
 ├── create_figures.py            # Generate publication figures
-└── analyze_creativity_scores.py # Distribution analysis
+├── analyze_creativity_scores.py # Distribution analysis
+└── analyze_covariance.py        # Cross-task correlation structure vs humans
 ```
 
 ## Usage
@@ -59,11 +69,18 @@ See [analysis_results/REPORT_MATCHED.md](analysis_results/REPORT_MATCHED.md) for
 # Generate LLM responses (requires API keys)
 python generate_responses.py --model crpo --output llm_responses_batch/crpo_responses.csv
 
+# Generate Centaur/Minitaur responses (see docs/RUNNING_CENTAUR.md for backends)
+python generate_centaur_responses.py --model centaur_70b --backend hf-router
+python generate_centaur_responses.py --model centaur_8b --backend vllm
+
 # Create matched human samples
 python create_matched_samples.py
 
 # Analyze creativity score distributions
 python analyze_creativity_scores.py
+
+# Cross-task correlation structure (human vs each model)
+python analyze_covariance.py
 
 # Generate publication figures
 python create_figures.py

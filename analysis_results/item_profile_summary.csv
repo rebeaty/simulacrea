@@ -1,0 +1,4 @@
+source,n_items,item_profile_r_vs_human
+cpo,24,0.8718529658094574
+gemini,24,0.531691626956495
+llama_base,24,0.7067721687562329

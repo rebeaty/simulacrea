@@ -26,15 +26,24 @@ COLORS = {
     'human': '#2ecc71',      # Green
     'cpo': '#e74c3c',        # Red (CRPO)
     'llama_base': '#3498db', # Blue
-    'gemini': '#9b59b6'      # Purple
+    'gemini': '#9b59b6',     # Purple
+    'centaur_70b': '#f39c12',# Orange
+    'centaur_8b': '#16a085'  # Teal
 }
 
 LABELS = {
     'human': 'Human',
     'cpo': 'CRPO',
     'llama_base': 'Llama Base',
-    'gemini': 'Gemini'
+    'gemini': 'Gemini',
+    'centaur_70b': 'Centaur-70B',
+    'centaur_8b': 'Minitaur-8B'
 }
+
+def model_sources(df):
+    """Non-human sources present in the data, in canonical order."""
+    present = set(df['source'].dropna().unique())
+    return [s for s in LABELS if s != 'human' and s in present]
 
 # ================== LOAD DATA ==================
 def load_data():
@@ -66,11 +75,10 @@ def create_distribution_figure(data):
         ('Story (MAoSS)', 'prediction', 'Story Creativity (MAoSS)')
     ]
 
-    sources = ['human', 'cpo', 'llama_base', 'gemini']
-
     for idx, (task_key, score_col, title) in enumerate(tasks):
         ax = axes[idx]
         df = data[task_key]
+        sources = ['human'] + model_sources(df)
 
         for source in sources:
             source_data = df[df['source'] == source][score_col].dropna()
@@ -136,7 +144,7 @@ def create_effect_size_figure(data):
         df = data[task_key]
         human_data = df[df['source'] == 'human'][score_col].dropna()
 
-        for source in ['cpo', 'llama_base', 'gemini']:
+        for source in model_sources(df):
             source_data = df[df['source'] == source][score_col].dropna()
             if len(source_data) > 0:
                 d_mean, d_lo, d_hi = bootstrap_cohens_d(human_data, source_data)
@@ -154,11 +162,13 @@ def create_effect_size_figure(data):
     fig, ax = plt.subplots(figsize=(10, 5))
 
     tasks = ['AUT', 'SCTT', 'Design Orig.', 'Design Eff.', 'Story']
-    models = ['CRPO', 'Llama Base', 'Gemini']
+    plotted_sources = [s for s in LABELS if s != 'human'
+                       and LABELS[s] in set(results_df['Model'])]
     x = np.arange(len(tasks))
-    width = 0.25
+    width = 0.8 / max(len(plotted_sources), 1)
 
-    for i, model in enumerate(models):
+    for i, source in enumerate(plotted_sources):
+        model = LABELS[source]
         model_data = results_df[results_df['Model'] == model]
         values = [model_data[model_data['Task'] == t]['Cohen_d'].values[0] for t in tasks]
         ci_lo = [model_data[model_data['Task'] == t]['CI_lo'].values[0] for t in tasks]
@@ -166,9 +176,9 @@ def create_effect_size_figure(data):
         # Error bars: distance from mean to CI bounds (always positive)
         errors_lo = [max(0, values[j] - ci_lo[j]) for j in range(len(tasks))]
         errors_hi = [max(0, ci_hi[j] - values[j]) for j in range(len(tasks))]
-        offset = (i - 1) * width
+        offset = (i - (len(plotted_sources) - 1) / 2) * width
         bars = ax.bar(x + offset, values, width, label=model,
-                     color=[COLORS['cpo'], COLORS['llama_base'], COLORS['gemini']][i],
+                     color=COLORS[source],
                      alpha=0.8, yerr=[errors_lo, errors_hi], capsize=3, error_kw={'linewidth': 1})
 
     # Add reference lines
@@ -200,8 +210,9 @@ def create_semantic_clustering_figure():
     sim_df = pd.read_csv(ANALYSIS_PATH / "semantic_similarity_matched.csv")
 
     # Calculate distance from human centroid (1 - similarity)
-    models = ['cpo', 'llama_base', 'gemini']
-    model_labels = ['CRPO', 'Llama Base', 'Gemini']
+    # use whichever model columns the semantic-similarity analysis produced
+    models = [s for s in LABELS if s != 'human' and f'{s}_centroid_sim' in sim_df.columns]
+    model_labels = [LABELS[s] for s in models]
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
     plt.subplots_adjust(wspace=0.3)  # Add spacing between panels
@@ -212,12 +223,12 @@ def create_semantic_clustering_figure():
     x = np.arange(len(tasks))
     width = 0.25
 
+    width = 0.8 / max(len(models), 1)
     for i, (model, label) in enumerate(zip(models, model_labels)):
         col = f'{model}_centroid_sim'
         values = sim_df[col].tolist()
-        offset = (i - 1) * width
-        color = [COLORS['cpo'], COLORS['llama_base'], COLORS['gemini']][i]
-        ax.bar(x + offset, values, width, label=label, color=color, alpha=0.8)
+        offset = (i - (len(models) - 1) / 2) * width
+        ax.bar(x + offset, values, width, label=label, color=COLORS[model], alpha=0.8)
 
     ax.axhline(y=1.0, color='gray', linestyle='--', alpha=0.3)
     ax.set_xlabel('Task')
@@ -237,7 +248,7 @@ def create_semantic_clustering_figure():
         col = f'{model}_centroid_sim'
         avg_sims.append(sim_df[col].mean())
 
-    colors = [COLORS['cpo'], COLORS['llama_base'], COLORS['gemini']]
+    colors = [COLORS[m] for m in models]
     bars = ax.bar(model_labels, avg_sims, color=colors, alpha=0.8, edgecolor='black', linewidth=1)
 
     # Add value labels on bars

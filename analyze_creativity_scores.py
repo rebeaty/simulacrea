@@ -33,13 +33,23 @@ def load_scored_data():
     return aut, sctt, design, story_dsi, story_maoss
 
 # ================== ANALYSIS ==================
+# Canonical source order; any additional sources found in the data (e.g.
+# centaur_70b, centaur_8b) are appended automatically.
+KNOWN_SOURCES = ['human', 'cpo', 'llama_base', 'gemini', 'centaur_70b', 'centaur_8b']
+
+def get_sources(df):
+    present = list(df['source'].dropna().unique())
+    ordered = [s for s in KNOWN_SOURCES if s in present]
+    ordered += sorted(s for s in present if s not in KNOWN_SOURCES)
+    return ordered
+
 def analyze_distribution(df, task_name, score_col='prediction'):
     """Analyze score distribution by source with statistical tests"""
     print(f"\n{'='*60}")
     print(f"{task_name}")
     print(f"{'='*60}")
 
-    sources = ['human', 'cpo', 'llama_base', 'gemini']
+    sources = get_sources(df)
     human_data = df[df['source'] == 'human'][score_col].dropna()
 
     # Descriptive stats
@@ -79,8 +89,9 @@ def plot_distributions(df, task_name, output_dir, score_col='prediction'):
     """Create distribution plot"""
     fig, ax = plt.subplots(figsize=(10, 5))
 
-    sources = ['human', 'cpo', 'llama_base', 'gemini']
-    colors = {'human': '#2ecc71', 'cpo': '#e74c3c', 'llama_base': '#3498db', 'gemini': '#9b59b6'}
+    sources = get_sources(df)
+    colors = {'human': '#2ecc71', 'cpo': '#e74c3c', 'llama_base': '#3498db', 'gemini': '#9b59b6',
+              'centaur_70b': '#f39c12', 'centaur_8b': '#16a085'}
 
     for source in sources:
         data = df[df['source'] == source][score_col].dropna()

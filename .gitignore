@@ -28,6 +28,7 @@ embedding_cache_matched/
 
 # Intermediate files
 matched_samples/
+task_csvs_for_cap/*_for_cap_matched.csv
 
 # Raw API logs (large debug files)
 raw_api_responses_*.log
